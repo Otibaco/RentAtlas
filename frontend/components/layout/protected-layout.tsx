@@ -1,0 +1,61 @@
+"use client"
+
+import type React from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
+import { Sidebar } from "./sidebar"
+import { Button } from "@/components/ui/button"
+import { Menu } from "lucide-react"
+import { Toaster } from "sonner"
+
+export function ProtectedLayout({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth()
+  const router = useRouter()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/login")
+    }
+  }, [isAuthenticated, router])
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setSidebarOpen(true)
+      } else {
+        setSidebarOpen(false)
+      }
+    }
+
+    handleResize()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  if (!isAuthenticated) {
+    return null
+  }
+
+  return (
+    <div className="flex h-screen overflow-hidden bg-background">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border/50 bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:hidden">
+          <Button onClick={() => setSidebarOpen(true)} variant="ghost" size="sm" className="h-10 w-10 p-0">
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Open menu</span>
+          </Button>
+          <h1 className="text-lg font-semibold">RentOps</h1>
+        </div>
+
+        <main className="flex-1 overflow-y-auto">
+          <Toaster />
+          {children}
+        </main>
+      </div>
+    </div>
+  )
+}
