@@ -1,0 +1,71 @@
+####################################
+# OS / Editor
+####################################
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+####################################
+# Logs
+####################################
+*.log
+logs/
+
+####################################
+# Node / Next.js
+####################################
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+frontend/.env.development
+
+####################################
+# Java / Maven
+####################################
+**/target/
+**/*.class
+**/*.jar
+**/*.war
+**/*.ear
+.mvn/
+mvnw
+mvnw.cmd
+
+####################################
+# Spring Boot
+####################################
+**/application-*.yml
+**/application-*.properties
+
+####################################
+# Docker
+####################################
+**/docker-compose.override.yml
+**/*.pid
+
+####################################
+# Kafka / Mongo data (if mounted later)
+####################################
+data/
+kafka-data/
+mongo-data/
+
+####################################
+# Test / Coverage
+####################################
+**/surefire-reports/
+**/failsafe-reports/
+**/jacoco/
+coverage/
+
+####################################
+# Temporary files
+####################################
+tmp/
+temp/
+*.tmp
