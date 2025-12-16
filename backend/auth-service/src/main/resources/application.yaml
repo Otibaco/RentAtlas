@@ -1,0 +1,15 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: 3600000 # 1 hour in ms

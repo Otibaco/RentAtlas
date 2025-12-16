@@ -15,12 +15,15 @@ services:
     depends_on:
       - auth-service
 
-  auth-service:
-    build: ./backend/auth-service
-    ports:
-      - "8081:8081"
-    depends_on:
-      - mongo
+auth-service:
+  build: ./backend/auth-service
+  ports:
+    - "8081:8081"
+  environment:
+    MONGO_URI: mongodb://mongo:27017/authdb
+    JWT_SECRET: super-secure-jwt-secret-512bits
+  depends_on:
+    - mongo
 
   property-service:
     build: ./backend/property-service
