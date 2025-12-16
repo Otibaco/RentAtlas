@@ -7,6 +7,7 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.5.8</version>
 		<relativePath/> <!-- lookup parent from repository -->
+
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>api-gateway</artifactId>
@@ -14,6 +15,9 @@
 	<name>api-gateway</name>
 	<description>api-gateway for my project</description>
 	<url/>
+	
+	
+
 	<licenses>
 		<license/>
 	</licenses>
@@ -31,6 +35,7 @@
 		<spring-cloud.version>2025.0.0</spring-cloud.version>
 	</properties>
 	<dependencies>
+
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-gateway-server-webflux</artifactId>
@@ -41,6 +46,7 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>io.projectreactor</groupId>
 			<artifactId>reactor-test</artifactId>
@@ -53,6 +59,7 @@
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

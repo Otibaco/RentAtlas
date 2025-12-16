@@ -53,7 +53,7 @@ export function RecentProperties() {
                   <div className="flex items-center gap-2">
                     <h3 className="font-medium text-sm truncate">{property.name}</h3>
                     {computedStatus.isExpiringSoon && !computedStatus.isExpired && (
-                      <AlertCircle className="h-4 w-4 text-warning flex-shrink-0" />
+                      <AlertCircle className="h-4 w-4 text-warning shrink-0" />
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground sm:text-sm truncate">
@@ -66,7 +66,7 @@ export function RecentProperties() {
                   )}
                 </div>
                 <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2">
-                  <Badge variant={getStatusVariant(computedStatus.displayStatus)} className="flex-shrink-0">
+                  <Badge variant={getStatusVariant(computedStatus.displayStatus)} className="shrink-0">
                     {computedStatus.displayStatus}
                   </Badge>
                   <p className="text-sm font-semibold">{formatCurrency(property.price)}/mo</p>
