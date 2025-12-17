@@ -1,0 +1,15 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+
+  data:
+    mongodb:
+      uri: mongodb+srv://orjifranklin42:frank999@cluster0.ngdmzy2.mongodb.net/RentAtlas?retryWrites=true&w=majority
+
+security:
+  jwt:
+    secret: 125c0a1d835d428b7bb1f4ed8acc701914cb6fbe207a74643ae974d9c942f07d
+    expiration: 3600000 # 1 hour in ms
