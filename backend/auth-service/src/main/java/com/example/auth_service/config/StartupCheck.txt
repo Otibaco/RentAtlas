@@ -1,0 +1,23 @@
+package com.example.auth_service.config;
+
+
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class StartupCheck {
+
+    @Value("${spring.data.mongodb.uri}")
+    private String mongoUri;
+
+    @Value("${security.jwt.secret}")
+    private String jwtSecret;
+
+    @PostConstruct
+    public void checkEnv() {
+        System.out.println("✔ MONGO_URI loaded: " + (mongoUri != null));
+        System.out.println("✔ JWT_SECRET loaded: " + (jwtSecret != null));
+    }
+}
+

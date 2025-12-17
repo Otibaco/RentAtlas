@@ -1,0 +1,57 @@
+package com.example.auth_service.config;
+
+import com.example.auth_service.model.User;
+import com.example.auth_service.repository.UserRepository;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+@Component
+public class DataSeeder implements CommandLineRunner {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public DataSeeder(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public void run(String... args) {
+
+        // Seed Admin user
+        seedUserIfNotExists(
+                "admin@company.com",
+                "admin123",
+                "ADMIN"
+        );
+
+        // Seed Staff user
+        seedUserIfNotExists(
+                "staff@company.com",
+                "staff123",
+                "STAFF"
+        );
+    }
+
+    
+    private void seedUserIfNotExists(String email, String rawPassword, String role) {
+        // Check if user already exists
+        if (userRepository.findByEmail(email).isPresent()) {
+            return; // User already exists
+        }
+
+        // Create new user
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(rawPassword)); // BCrypt hash
+        user.setRole(role);
+        user.setEnabled(true);
+
+        // Save user to MongoDB
+        userRepository.save(user);
+
+        System.out.println("✔ Seeded user: " + email + " (" + role + ")");
+    }
+}

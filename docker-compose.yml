@@ -19,9 +19,11 @@ auth-service:
   build: ./backend/auth-service
   ports:
     - "8081:8081"
-  environment:
-    MONGO_URI: mongodb://mongo:27017/authdb
-    JWT_SECRET: super-secure-jwt-secret-512bits
+  # environment:
+  #   MONGO_URI: mongodb://mongo:217/authdb
+  #   JWT_SECRET: super-secure-jwt-secret-512bits
+  env_file:
+    - .env
   depends_on:
     - mongo
 
