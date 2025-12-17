@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Application secrets
+# -----------------------
+/application.yml
+/application.properties
+.env

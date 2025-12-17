@@ -20,10 +20,10 @@ auth-service:
   ports:
     - "8081:8081"
   # environment:
-  #   MONGO_URI: mongodb://mongo:217/authdb
+  #   MONGO_URI: mongodb://mongo:***/authdb
   #   JWT_SECRET: super-secure-jwt-secret-512bits
   env_file:
-    - .env
+    - .env 
   depends_on:
     - mongo
 
