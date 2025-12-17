@@ -12,3 +12,4 @@ db.users.insertMany([
     enabled: true
   }
 ])
+// Add more initial data as needed
