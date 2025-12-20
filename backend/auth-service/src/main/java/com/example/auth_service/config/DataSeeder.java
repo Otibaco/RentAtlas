@@ -31,7 +31,7 @@ public class DataSeeder implements CommandLineRunner {
         seedUserIfNotExists(
                 "staff@company.com",
                 "staff123",
-                "STAFF"
+                "STAFF" 
         );
     }
 

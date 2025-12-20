@@ -11,11 +11,12 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowRight, Building2, Sparkles } from "lucide-react"
+import {Snowfall} from "react-snowfall/lib/Snowfall"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [role, setRole] = useState<UserRole>("admin")
+  const [role, setRole] = useState<UserRole>("ADMIN")
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const { login } = useAuth()
@@ -52,6 +53,7 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-background px-4">
+      <Snowfall />
       <Toaster />
 
       {/* Background */}
@@ -120,8 +122,8 @@ export default function LoginPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Administrator</SelectItem>
-                  <SelectItem value="staff">Staff</SelectItem>
+                  <SelectItem value="ADMIN">Administrator</SelectItem>
+                  <SelectItem value="STAFF">Staff</SelectItem>
                 </SelectContent>
               </Select>
             </div>

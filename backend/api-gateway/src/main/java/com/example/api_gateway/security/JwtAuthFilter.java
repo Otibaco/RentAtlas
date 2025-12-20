@@ -1,23 +1,30 @@
 package com.example.api_gateway.security;
 
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 @Component
-public class JwtAuthFilter implements GlobalFilter {
+public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     private final WebClient webClient;
+    private final String validateUrl;
 
-    public JwtAuthFilter(WebClient.Builder builder) {
+    public JwtAuthFilter(
+            WebClient.Builder builder,
+            @Value("${security.auth.validate-url}") String validateUrl) {
+
         this.webClient = builder.build();
+        this.validateUrl = validateUrl;
     }
 
     @Override
@@ -25,12 +32,14 @@ public class JwtAuthFilter implements GlobalFilter {
 
         String path = exchange.getRequest().getURI().getPath();
 
-        // Allow auth endpoints
+        // 1️⃣ Allow public auth endpoints
         if (path.startsWith("/auth")) {
             return chain.filter(exchange);
         }
 
-        String authHeader = exchange.getRequest().getHeaders()
+        // 2️⃣ Read Authorization header
+        String authHeader = exchange.getRequest()
+                .getHeaders()
                 .getFirst(HttpHeaders.AUTHORIZATION);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -38,18 +47,26 @@ public class JwtAuthFilter implements GlobalFilter {
             return exchange.getResponse().setComplete();
         }
 
-        String token = authHeader.substring(7);
-
+        // 3️⃣ Call auth-service for validation
         return webClient
                 .get()
-                .uri("http://auth-service:8081/auth/validate?token=" + token)
+                .uri(validateUrl)
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, r -> Mono.error(new RuntimeException("Invalid JWT")))
                 .bodyToMono(Void.class)
+                .timeout(Duration.ofSeconds(3))
                 .then(chain.filter(exchange))
-                .onErrorResume(e -> {
+                .onErrorResume(ex -> {
                     exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                     return exchange.getResponse().setComplete();
                 });
+    }
+
+    /**
+     * Security filters must run early
+     */
+    @Override
+    public int getOrder() {
+        return -100;
     }
 }

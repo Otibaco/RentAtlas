@@ -13,7 +13,6 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "RentOps - Property Rental Management",
   description: "Modern property rental management dashboard",
-  generator: "v0.app",
   icons: {
     icon: [
       {

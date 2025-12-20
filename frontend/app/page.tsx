@@ -6,15 +6,17 @@ import { useAuth } from "@/contexts/auth-context"
 
 export default function HomePage() {
   const router = useRouter()
-  const { isAuthenticated } = useAuth()
+  const { user } = useAuth()
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/dashboard")
+    if (!user) {
+      router.replace("/login")
+    } else if (user.role === "ADMIN") {
+      router.replace("/dashboard/admin")
     } else {
-      router.push("/login")
+      router.replace("/dashboard/staff")
     }
-  }, [isAuthenticated, router])
+  }, [user, router])
 
   return null
 }

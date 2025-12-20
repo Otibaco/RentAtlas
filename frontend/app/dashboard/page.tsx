@@ -8,6 +8,7 @@ import { ProtectedLayout } from "@/components/layout/protected-layout"
 import { useProperties } from "@/contexts/property-context"
 import { getComputedStatus } from "@/lib/get-computed-status"
 import { Home, CheckCircle, Key, AlertCircle } from "lucide-react"
+import { Snowfall } from "react-snowfall/lib/Snowfall"
 
 export default function DashboardPage() {
   const { properties } = useProperties()
@@ -27,6 +28,7 @@ export default function DashboardPage() {
 
   return (
     <ProtectedLayout>
+      <Snowfall />
       <div className="p-4 sm:p-6 lg:p-8">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Dashboard</h1>
