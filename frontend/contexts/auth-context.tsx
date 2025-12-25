@@ -1,7 +1,6 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react"
-import { decodeJwt } from "@/lib/jwt"
 
 export type UserRole = "ADMIN" | "STAFF"
 
@@ -15,83 +14,78 @@ interface AuthContextType {
   isAuthenticated: boolean
   login: (email: string, password: string, role: UserRole) => Promise<void>
   logout: () => void
+  loading: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
-
-if (!API_BASE_URL) {
-  throw new Error("NEXT_PUBLIC_API_BASE_URL is not defined")
-}
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
+if (!API_BASE_URL) throw new Error("NEXT_PUBLIC_API_BASE_URL not defined")
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  /**
-   * Restore session from cookie (client-side UX only)
-   */
+  // console.log("API BASE URL =",API_BASE_URL);
+
+
+  // Restore session
   useEffect(() => {
-    const token = document.cookie
-      .split("; ")
-      .find(c => c.startsWith("token="))
-      ?.split("=")[1]
+    let cancelled = false;
 
-    if (!token) return
-
-    const decoded = decodeJwt(token)
-
-    if (decoded.exp * 1000 < Date.now()) {
-      logout()
-      return
-    }
-
-    setUser({
-      email: decoded.sub,
-      role: decoded.role,
+    fetch(`${API_BASE_URL}/auth/me`, {
+      credentials: "include",
     })
-  }, [])
+      .then(res => (res.ok ? res.json() : null))
+      .then(user => {
+        if (!cancelled) setUser(user);
+      })
+      .catch(() => {
+        if (!cancelled) setUser(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
 
-  /**
-   * Login → backend → set cookie
-   */
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+
   const login = async (email: string, password: string, role: UserRole) => {
     const res = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-Client-Type": "web",
+      },
+      credentials: "include",
       body: JSON.stringify({ email, password, role }),
     })
 
-    if (!res.ok) {
-      throw new Error("Invalid credentials")
-    }
+    if (!res.ok) throw new Error("Invalid credentials")
 
-    const { token } = await res.json()
-    const decoded = decodeJwt(token)
+    // Fetch user info after login
+    const me = await fetch(`${API_BASE_URL}/auth/me`, {
+      credentials: "include",
+    }).then(r => r.json())
 
-    // Store token in cookie (Proxy-readable)
-    document.cookie = `token=${token}; path=/; SameSite=Lax`
-
-    setUser({
-      email: decoded.sub,
-      role: decoded.role,
-    })
+    setUser(me)
   }
 
-  const logout = () => {
-    document.cookie = "token=; Max-Age=0; path=/"
+  const logout = async () => {
+    await fetch(`${API_BASE_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    })
     setUser(null)
   }
 
+
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        login,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   )

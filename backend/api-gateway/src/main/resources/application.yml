@@ -11,9 +11,11 @@ spring:
         webflux:
           routes:
             - id: auth-service
-              uri: http://auth-service:8081
+              # uri: http://auth-service:8081
+              uri: http://localhost:8081/
               predicates:
                 - Path=/auth/**
+                
 
             - id: property-service
               uri: http://property-service:8082
