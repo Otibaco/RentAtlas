@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 
-const BACKEND_URL = "http://localhost:8080/auth/login"
+const BACKEND_URL = process.env.BACKEND_URL + "/auth/login"
 
 export async function POST(req: Request) {
   const { email, password } = await req.json()
