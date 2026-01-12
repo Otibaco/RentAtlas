@@ -71,7 +71,7 @@ export default function PropertiesPage() {
               <Download className="mr-2 h-4 w-4" />
               Export JSON
             </Button>
-            {user?.role === "admin" && (
+            {user?.role === "ADMIN" && (
               <Link href="/properties/add" className="w-full sm:w-auto">
                 <Button className="w-full">
                   <Plus className="mr-2 h-4 w-4" />

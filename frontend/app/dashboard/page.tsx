@@ -4,7 +4,6 @@
 import { PropertyChart } from "@/components/dashboard/property-chart"
 import { RecentProperties } from "@/components/dashboard/recent-properties"
 import { StatCard } from "@/components/dashboard/stat-card"
-import { ProtectedLayout } from "@/components/layout/protected-layout"
 import { useProperties } from "@/contexts/property-context"
 import { getComputedStatus } from "@/lib/get-computed-status"
 import { Home, CheckCircle, Key, AlertCircle } from "lucide-react"
@@ -27,8 +26,8 @@ export default function DashboardPage() {
   )
 
   return (
-    <ProtectedLayout>
-      <Snowfall />
+    <div>
+      {/* <Snowfall /> */}
       <div className="p-4 sm:p-6 lg:p-8">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Dashboard</h1>
@@ -59,6 +58,6 @@ export default function DashboardPage() {
           <PropertyChart />
         </div>
       </div>
-    </ProtectedLayout>
+    </div>
   )
 }

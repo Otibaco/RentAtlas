@@ -15,7 +15,6 @@ spring:
               uri: http://localhost:8081/
               predicates:
                 - Path=/auth/**
-                
 
             - id: property-service
               uri: http://property-service:8082
@@ -37,3 +36,4 @@ security:
 #     web:
 #       exposure:
 #         include: health,info
+

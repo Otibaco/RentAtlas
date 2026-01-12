@@ -4,7 +4,6 @@ import { Geist, Geist_Mono } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/contexts/theme-context"
-import { AuthProvider } from "@/contexts/auth-context"
 import { PropertyProvider } from "@/contexts/property-context"
 
 const _geist = Geist({ subsets: ["latin"] })
@@ -41,9 +40,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-sans antialiased`}>
         <ThemeProvider>
-          <AuthProvider>
             <PropertyProvider>{children}</PropertyProvider>
-          </AuthProvider>
         </ThemeProvider>
         {/* <Analytics /> */}
       </body>

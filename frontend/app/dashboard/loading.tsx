@@ -1,11 +1,10 @@
 "use client"
 
-import { ProtectedLayout } from "@/components/layout/protected-layout"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export default function Loading() {
   return (
-    <ProtectedLayout>
+    <div>
       <div className="p-8">
         <div className="mb-8">
           <Skeleton className="h-9 w-48 mb-2" />
@@ -23,6 +22,6 @@ export default function Loading() {
           <Skeleton className="h-96 rounded-lg" />
         </div>
       </div>
-    </ProtectedLayout>
+    </div>
   )
 }

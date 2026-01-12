@@ -20,5 +20,6 @@ public class User {
     private String role; // ADMIN / STAFF
 
     private boolean enabled;
+    
 }
 

@@ -3,7 +3,6 @@
 import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth, UserRole } from "@/contexts/auth-context"
 import { motion } from "framer-motion"
 import { toast, Toaster } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -11,15 +10,14 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowRight, Building2, Sparkles } from "lucide-react"
-import {Snowfall} from "react-snowfall/lib/Snowfall"
+
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [role, setRole] = useState<UserRole>("ADMIN")
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
-  const { login } = useAuth()
   const router = useRouter()
 
   const validateForm = () => {
@@ -35,14 +33,25 @@ export default function LoginPage() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!validateForm()) return
+    if (!email || !password) {
+      toast.error("Email and password required")
+      return
+    }
 
     setIsLoading(true)
     try {
-      await login(email, password, role)
-      toast.success("Welcome back")
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Login failed")
+
+      toast.success("Login successful")
       router.push("/dashboard")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Login failed")
@@ -53,7 +62,7 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-background px-4">
-      <Snowfall />
+      {/* <Snowfall /> */}
       <Toaster />
 
       {/* Background */}
@@ -115,7 +124,7 @@ export default function LoginPage() {
               )}
             </div>
 
-            <div className="space-y-1.5">
+            {/* <div className="space-y-1.5">
               <Label>Role</Label>
               <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
                 <SelectTrigger className="h-10">
@@ -126,7 +135,7 @@ export default function LoginPage() {
                   <SelectItem value="STAFF">Staff</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
 
             <Button
               type="submit"

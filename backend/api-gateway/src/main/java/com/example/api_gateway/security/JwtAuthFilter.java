@@ -4,14 +4,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.core.Ordered;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
 
 @Component
 public class JwtAuthFilter implements GlobalFilter, Ordered {
@@ -28,45 +25,48 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     }
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+    public Mono<Void> filter(ServerWebExchange exchange,
+                             GatewayFilterChain chain) {
 
         String path = exchange.getRequest().getURI().getPath();
 
-        // 1️⃣ Allow public auth endpoints
-        if (path.startsWith("/auth")) {
+        // ✅ PUBLIC ENDPOINTS
+        if (path.startsWith("/auth/login")
+                || path.startsWith("/auth/logout")
+                || path.startsWith("/auth/validate")) {
             return chain.filter(exchange);
         }
 
-        // 2️⃣ Read Authorization header
-        String authHeader = exchange.getRequest()
+        // ✅ READ AUTH HEADER
+        String authHeader = exchange
+                .getRequest()
                 .getHeaders()
-                .getFirst(HttpHeaders.AUTHORIZATION);
+                .getFirst("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            exchange.getResponse()
+                    .setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
 
-        // 3️⃣ Call auth-service for validation
+        // ✅ VALIDATE TOKEN VIA AUTH SERVICE
         return webClient
                 .get()
                 .uri(validateUrl)
-                .header(HttpHeaders.AUTHORIZATION, authHeader)
+                .header("Authorization", authHeader)
                 .retrieve()
                 .bodyToMono(Void.class)
-                .timeout(Duration.ofSeconds(3))
                 .then(chain.filter(exchange))
-                .onErrorResume(ex -> {
-                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                .onErrorResume(e -> {
+                    exchange.getResponse()
+                            .setStatusCode(HttpStatus.UNAUTHORIZED);
                     return exchange.getResponse().setComplete();
                 });
     }
 
-    /**
-     * Security filters must run early
-     */
     @Override
     public int getOrder() {
         return -100;
     }
 }
+

@@ -1,49 +1,25 @@
-// proxy.ts
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { decodeJwt } from "@/lib/jwt";
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
-export function proxy(request: NextRequest) {
-  const token = request.cookies.get("token")?.value;
-  const { pathname } = request.nextUrl;
+// Runs on all dashboard/protected pages
+export function proxy(req: NextRequest) {
+  const token = req.cookies.get("token")?.value
 
-  // Public routes
-  if (pathname.startsWith("/login") || pathname.startsWith("/api/public")) {
-    return NextResponse.next();
+  // If no token, redirect to login
+  if (!token && req.nextUrl.pathname.startsWith("/dashboard")) {
+    return NextResponse.redirect(new URL("/login", req.url))
   }
 
-  // No token → redirect to login
-  if (!token) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  // If token exists and user is on /login, redirect to dashboard
+  if (token && req.nextUrl.pathname === "/login") {
+    return NextResponse.redirect(new URL("/dashboard", req.url))
   }
 
-  try {
-    const decoded = decodeJwt(token);
-
-    // Expired token → redirect to login and delete cookie
-    if (decoded.exp * 1000 < Date.now()) {
-      const res = NextResponse.redirect(new URL("/login", request.url));
-      res.cookies.delete("token");
-      return res;
-    }
-
-    // Role-based routing
-    if (pathname.startsWith("/dashboard/admin") && decoded.role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/dashboard/staff", request.url));
-    }
-
-    if (pathname.startsWith("/dashboard/staff") && decoded.role !== "STAFF") {
-      return NextResponse.redirect(new URL("/dashboard/admin", request.url));
-    }
-
-    return NextResponse.next();
-  } catch (err) {
-    // Invalid token → redirect
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  // Continue request normally
+  return NextResponse.next()
 }
 
-// Match all dashboard routes
+// Run proxy only on these paths
 export const config = {
-  matcher: ["/dashboard/:path*"],
-};
+  matcher: ["/dashboard/:path*", "/login"],
+}

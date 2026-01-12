@@ -11,8 +11,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,16 +20,20 @@ public class JwtService {
     private final JwtProperties jwtProperties;
 
     public String generateToken(User user) {
-        byte[] keyBytes = jwtProperties.getSecret().getBytes();
 
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .claim("role", user.getRole())
                 .setIssuedAt(new Date())
                 .setExpiration(
-                        new Date(System.currentTimeMillis() + jwtProperties.getExpiration())
+                        new Date(System.currentTimeMillis()
+                                + jwtProperties.getExpiration())
                 )
-                .signWith(Keys.hmacShaKeyFor(keyBytes), SignatureAlgorithm.HS256)
+                .signWith(
+                        Keys.hmacShaKeyFor(
+                                jwtProperties.getSecret().getBytes()),
+                        SignatureAlgorithm.HS256
+                )
                 .compact();
     }
 
@@ -42,27 +44,15 @@ public class JwtService {
                 .parseClaimsJws(token);
     }
 
-    /**
-     * Extract JWT from HttpOnly cookie
-     */
-    public String extractTokenFromRequest(HttpServletRequest request) {
-        if (request.getCookies() == null) {
-            throw new RuntimeException("No cookies found");
+    public String extractTokenFromHeader(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Missing or invalid Authorization header");
         }
-
-        for (Cookie cookie : request.getCookies()) {
-            if ("token".equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-
-        throw new RuntimeException("JWT cookie not found");
+        return authHeader.substring(7);
     }
 
-    /**
-     * Extract user info from JWT
-     */
     public User getUserFromToken(String token) {
+
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(jwtProperties.getSecret().getBytes())
                 .build()
