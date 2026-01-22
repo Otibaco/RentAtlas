@@ -11,30 +11,40 @@ export async function POST(req: Request) {
     body: JSON.stringify({ email, password }),
   })
 
-
-
   if (!res.ok) {
     const error = await res.json().catch(() => ({ message: "Login failed" }))
     return NextResponse.json({ error: error.message }, { status: 401 })
   }
-  
 
   const data = await res.json()
 
   const response = NextResponse.json({
-    email: data.email,
-    role: data.role,
-    message: data.message,
+    message: "Login successful",
   })
 
+  // 🔐 JWT (HttpOnly)
   response.cookies.set({
     name: "token",
     value: data.token,
     httpOnly: true,
-    path: "/",
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24, // 1 day
+    path: "/",
+    maxAge: 60 * 60 * 24,
+  })
+
+  // 👤 User identity (non-sensitive)
+  response.cookies.set({
+    name: "user",
+    value: JSON.stringify({
+      email: data.email,
+      role: data.role,
+    }),
+    httpOnly: false,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60 * 24,
   })
 
   return response

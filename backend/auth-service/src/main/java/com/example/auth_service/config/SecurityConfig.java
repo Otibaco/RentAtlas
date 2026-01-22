@@ -30,14 +30,12 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/auth/login",
-                    "/auth/validate",
-                    "/auth/logout"
+                    "/auth/logout",
+                    "/auth/validate"
                 ).permitAll()
-                .requestMatchers("/auth/me").authenticated()
-                .anyRequest().denyAll()
+                .anyRequest().authenticated()
             );
 
-        // ✅ Add JWT filter before default auth filter
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -2,6 +2,7 @@ package com.example.auth_service.controller;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.auth_service.dto.LoginRequest;
@@ -12,6 +13,7 @@ import com.example.auth_service.service.JwtService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import com.example.auth_service.model.User;
 
 @RestController
 @RequestMapping("/auth")
@@ -27,9 +29,6 @@ public class AuthController {
      * NO cookies here
      */
 
-    
-
-
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
             @RequestBody @Valid LoginRequest request) {
@@ -41,8 +40,7 @@ public class AuthController {
                 token,
                 user.getEmail(),
                 user.getRole(),
-                "Login successful"
-        );
+                "Login successful");
 
         return ResponseEntity.ok(response);
     }
@@ -51,15 +49,11 @@ public class AuthController {
      * RESTORE SESSION
      * Requires Authorization header
      */
-    @GetMapping("/me")
-    public ResponseEntity<User> me(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
-
-        String token = jwtService.extractTokenFromHeader(authHeader);
-        User user = jwtService.getUserFromToken(token);
-
-        return ResponseEntity.ok(user);
-    }
+    // @GetMapping("/me")
+    // public ResponseEntity<User> me(Authentication authentication) {
+    //     User user = (User) authentication.getPrincipal();
+    //     return ResponseEntity.ok(user);
+    // }
 
     /**
      * TOKEN VALIDATION (used by API Gateway)

@@ -30,18 +30,32 @@ public class JwtService {
                                 + jwtProperties.getExpiration())
                 )
                 .signWith(
-                        Keys.hmacShaKeyFor(
-                                jwtProperties.getSecret().getBytes()),
+                        Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes()),
                         SignatureAlgorithm.HS256
                 )
                 .compact();
     }
 
+    /**
+     * ✅ VALIDATE TOKEN (throws exception if invalid)
+     */
     public void validateToken(String token) {
         Jwts.parserBuilder()
                 .setSigningKey(jwtProperties.getSecret().getBytes())
                 .build()
                 .parseClaimsJws(token);
+    }
+
+    /**
+     * ✅ SAFE BOOLEAN CHECK (used by filters)
+     */
+    public boolean isTokenValid(String token) {
+        try {
+            validateToken(token);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     public String extractTokenFromHeader(String authHeader) {
